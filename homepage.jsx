@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   const [teachings, setTeachings] = useState([]);
@@ -10,7 +11,7 @@ const HomePage = () => {
         const res = await fetch('https://harvesters-hub.onrender.com/api/teachings');
         const data = await res.json();
 
-        // Shuffle the teachings randomly
+        // Shuffle teachings randomly
         const shuffled = data.sort(() => 0.5 - Math.random());
         setTeachings(shuffled);
         setLoading(false);
@@ -31,9 +32,16 @@ const HomePage = () => {
           <img src="/logo.png" alt="Harvesters Logo" className="h-10 w-auto" />
         </div>
         <ul className="flex gap-6 text-sm font-medium">
-          <li><a href="/" className="text-blue-600">Home</a></li>
-          <li><a href="/campuses" className="hover:text-blue-600">Campuses</a></li>
-          <li><a href="/login" className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Sign In</a></li>
+          <li><Link to="/" className="text-blue-600">Home</Link></li>
+          <li><Link to="/campuses" className="hover:text-blue-600">Campuses</Link></li>
+          <li>
+            <Link
+              to="/login"
+              className="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Sign In
+            </Link>
+          </li>
         </ul>
       </nav>
 
@@ -63,15 +71,19 @@ const HomePage = () => {
                   <iframe
                     className="w-full h-full"
                     src={teaching.videoUrl}
-                    title={teaching.title}
+                    title={teaching.title || 'Teaching Video'}
                     frameBorder="0"
                     allowFullScreen
                   ></iframe>
                 </div>
                 <div className="p-4">
-                  <h2 className="font-semibold text-lg mb-1">{teaching.title}</h2>
+                  <h2 className="font-semibold text-lg mb-1">
+                    {teaching.title || 'Untitled'}
+                  </h2>
                   <p className="text-sm text-gray-500 mb-2">
-                    {teaching.campus ? `${teaching.campus.name} Campus` : 'Main Church'}
+                    {teaching?.campus?.name
+                      ? `${teaching.campus.name} Campus`
+                      : 'Main Church'}
                   </p>
                   <div className="flex justify-between items-center text-xs text-gray-600">
                     <span>👁 {teaching.views}</span>
@@ -79,18 +91,19 @@ const HomePage = () => {
                     <span>💬 {teaching.comments?.length || 0}</span>
                   </div>
                   <div className="flex justify-between mt-3">
-                    <a
-                      href={`/teaching.html?id=${teaching._id}`}
+                    <Link
+                      to={`/teaching/${teaching._id}`}
                       className="text-blue-600 hover:underline text-sm"
                     >
                       View
-                    </a>
+                    </Link>
                     <button
-                      onClick={() =>
+                      onClick={() => {
                         navigator.clipboard.writeText(
-                          `${window.location.origin}/teaching.html?id=${teaching._id}`
-                        )
-                      }
+                          `${window.location.origin}/teaching/${teaching._id}`
+                        );
+                        alert('Link copied to clipboard!');
+                      }}
                       className="text-gray-500 text-sm hover:text-gray-700"
                     >
                       Share 🔗
